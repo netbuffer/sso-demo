@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: sso-server
+
+server:
+  port: 17000
+
+logging:
+  level:
+    root: INFO
+    cn:
+      dev33:
+        satoken: debug
+    org:
+      springframework:
+        web:
+          servlet:
+            DispatcherServlet: DEBUG
+
+print-server-address:
+  ignore-parent-context: true
+
+info:
+  app: ${spring.application.name}
+
+sa-token:
+  timeout: 86400
+  activity-timeout: 1200
+  sso:
+    # 使用Http请求校验ticket
+    is-http: true
+    # Ticket有效期 (单位: 秒)，默认五分钟
+    ticket-timeout: 300
+    # 所有允许的授权回调地址 （此处为了方便测试配置为*，线上生产环境一定要配置为详细地地址）
+    allow-url: "*"

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>sso-server认证中心</title>
+</head>
+<body>
+
+<div>
+    当前会话在SSO-Server端尚未登录
+    <form>
+        <label>name:</label>
+        <input name="name" type="text" />
+        <label>password:</label>
+        <input name="password" type="password" />
+    </form>
+    <button onclick="login()">登录</button>
+</div>
+<script>
+    function login(){
+        var name=document.querySelector("input[name='name']").value;
+        var password=document.querySelector("input[name='password']").value;
+        console.log("name:%s",name);
+        var formData = new FormData();
+        formData.append('name', name);
+        formData.append('pwd', password);
+        fetch("/sso/doLogin", {
+            body: formData, // must match 'Content-Type' header
+            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
+            // headers: {
+            //     'content-type': 'application/json'
+            // },
+            method: 'POST', // *GET, POST, PUT, DELETE, etc.
+            mode: 'cors', // no-cors, cors, *same-origin
+        })
+        .then(response => {
+            var json=response.json();
+            return json
+        })
+        .then(data => {
+            if (data.code == 200) {
+                alert("认证成功")
+                location.href = location.search.slice(location.search.indexOf("redirect") + 9);
+            }else {
+                alert("认证失败")
+            }
+        })
+    }
+</script>
+</body>
+</html>
