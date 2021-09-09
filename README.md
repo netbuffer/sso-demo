@@ -1,6 +1,7 @@
 # sso-demo
 > 基于 [sa-token](https://sa-token.dev33.cn/) 实现单点登录系统
-
+* https://github.com/netbuffer/sso-demo
+* https://gitee.com/netbuffer/sso-demo
 
 ### step
 1. edit C:\Windows\System32\drivers\etc\hosts  
