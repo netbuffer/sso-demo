@@ -17,6 +17,7 @@
     <modules>
         <module>sso-server</module>
         <module>sso-client-system-1</module>
+        <module>sso-client-system-2</module>
     </modules>
 
     <name>sso-demo</name>

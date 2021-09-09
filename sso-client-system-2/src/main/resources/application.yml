@@ -1,0 +1,36 @@
+spring:
+  application:
+    name: sso-client-system-2
+
+server:
+  port: 17002
+
+logging:
+  level:
+    root: INFO
+    cn:
+      dev33:
+        satoken: debug
+    org:
+      springframework:
+        web:
+          servlet:
+            DispatcherServlet: DEBUG
+
+print-server-address:
+  ignore-parent-context: true
+
+info:
+  app: ${spring.application.name}
+
+sa-token:
+  timeout: 86400
+  activity-timeout: 1200
+  sso:
+    # SSO-Server端 统一认证地址
+    auth-url: http://sso-server.com:17000/sso/auth
+    # 是否打开单点注销接口
+    is-slo: true
+    is-http: true
+    # SSO-Server端 ticket校验地址
+    check-ticket-url: http://sso-server.com:17000/sso/checkTicket
