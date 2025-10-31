@@ -1,51 +1,244 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>sso-server认证中心</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SSO认证中心 - 统一登录平台</title>
+    <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.staticfile.org/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+            max-width: 400px;
+            backdrop-filter: blur(10px);
+        }
+        .login-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .login-header h2 {
+            color: #333;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        .login-header p {
+            color: #666;
+            font-size: 14px;
+        }
+        .form-control {
+            border-radius: 10px;
+            border: 2px solid #e9ecef;
+            padding: 12px 20px;
+            transition: all 0.3s ease;
+        }
+        .form-control:focus {
+            border-color: #667eea;
+            box-shadow: 0 0 0 0.2rem rgba(102, 126, 234, 0.25);
+        }
+        .input-group-text {
+            background: transparent;
+            border-radius: 10px 0 0 10px;
+            border: 2px solid #e9ecef;
+            border-right: none;
+        }
+        .btn-login {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border: none;
+            border-radius: 10px;
+            padding: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        .btn-login:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        .status-text {
+            text-align: center;
+            color: #6c757d;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+        .form-label {
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+    </style>
 </head>
 <body>
+    <div class="login-container">
+        <div class="login-header">
+            <h2><i class="fas fa-lock me-2"></i>SSO认证中心</h2>
+            <p>统一身份认证平台</p>
+        </div>
 
-<div>
-    当前会话在SSO-Server端尚未登录
-    <form>
-        <label>name:</label>
-        <input name="name" type="text" />
-        <label>password:</label>
-        <input name="password" type="password" />
-    </form>
-    <button onclick="login()">登录</button>
-</div>
-<script>
-    function login(){
-        var name=document.querySelector("input[name='name']").value;
-        var password=document.querySelector("input[name='password']").value;
-        console.log("name:%s",name);
-        var formData = new FormData();
-        formData.append('name', name);
-        formData.append('pwd', password);
-        fetch("/sso/doLogin", {
-            body: formData, // must match 'Content-Type' header
-            cache: 'no-cache', // *default, no-cache, reload, force-cache, only-if-cached
-            // headers: {
-            //     'content-type': 'application/json'
-            // },
-            method: 'POST', // *GET, POST, PUT, DELETE, etc.
-            mode: 'cors', // no-cors, cors, *same-origin
-        })
-        .then(response => {
-            var json=response.json();
-            return json
-        })
-        .then(data => {
-            if (data.code == 200) {
-                alert("认证成功")
-                location.href = location.search.slice(location.search.indexOf("redirect") + 9);
-            }else {
-                alert("认证失败")
+        <div class="status-text">
+            <i class="fas fa-info-circle me-2"></i>当前会话尚未登录
+        </div>
+
+        <form id="loginForm">
+            <div class="mb-3">
+                <label class="form-label">用户名</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-user"></i></span>
+                    <input type="text" class="form-control" name="name" placeholder="请输入用户名" required>
+                </div>
+            </div>
+
+            <div class="mb-4">
+                <label class="form-label">密码</label>
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-lock"></i></span>
+                    <input type="password" class="form-control" name="password" placeholder="请输入密码" required>
+                </div>
+            </div>
+
+            <button type="button" class="btn btn-login w-100 mb-3" onclick="login()">
+                <i class="fas fa-sign-in-alt me-2"></i>登录
+            </button>
+
+            <div class="text-center">
+                <small class="text-muted">安全认证 · 统一登录 · 便捷访问</small>
+            </div>
+        </form>
+    </div>
+
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/5.3.0/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Toast通知容器 -->
+    <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999">
+        <div id="toastTemplate" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <i class="fas fa-circle me-2 toast-icon"></i>
+                <strong class="me-auto toast-title">通知</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body toast-message"></div>
+        </div>
+    </div>
+
+    <script>
+        // Toast通知函数
+        function showToast(message, type = 'info') {
+            const toastContainer = document.querySelector('.toast-container');
+            const toastTemplate = document.getElementById('toastTemplate');
+            const toastClone = toastTemplate.cloneNode(true);
+            toastClone.id = 'toast-' + Date.now();
+
+            // 设置样式和图标
+            const toastIcon = toastClone.querySelector('.toast-icon');
+            const toastHeader = toastClone.querySelector('.toast-header');
+            const toastTitle = toastClone.querySelector('.toast-title');
+
+            switch(type) {
+                case 'success':
+                    toastIcon.className = 'fas fa-check-circle me-2 text-success';
+                    toastHeader.classList.add('bg-success', 'text-white');
+                    toastTitle.textContent = '成功';
+                    break;
+                case 'error':
+                    toastIcon.className = 'fas fa-exclamation-circle me-2 text-danger';
+                    toastHeader.classList.add('bg-danger', 'text-white');
+                    toastTitle.textContent = '错误';
+                    break;
+                case 'warning':
+                    toastIcon.className = 'fas fa-exclamation-triangle me-2 text-warning';
+                    toastHeader.classList.add('bg-warning', 'text-white');
+                    toastTitle.textContent = '警告';
+                    break;
+                default:
+                    toastIcon.className = 'fas fa-info-circle me-2 text-info';
+                    toastHeader.classList.add('bg-info', 'text-white');
+                    toastTitle.textContent = '信息';
             }
-        })
-    }
-</script>
+
+            toastClone.querySelector('.toast-message').textContent = message;
+            toastContainer.appendChild(toastClone);
+
+            const toast = new bootstrap.Toast(toastClone, {
+                animation: true,
+                autohide: true,
+                delay: 3000
+            });
+
+            toast.show();
+
+            // 自动移除DOM元素
+            toastClone.addEventListener('hidden.bs.toast', function () {
+                toastClone.remove();
+            });
+        }
+
+        function login() {
+            const form = document.getElementById('loginForm');
+            const name = document.querySelector("input[name='name']").value;
+            const password = document.querySelector("input[name='password']").value;
+
+            if (!name || !password) {
+                showToast('请输入用户名和密码', 'warning');
+                return;
+            }
+
+            const loginBtn = document.querySelector('.btn-login');
+            const originalText = loginBtn.innerHTML;
+            loginBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>登录中...';
+            loginBtn.disabled = true;
+
+            console.log("用户名:", name);
+            var formData = new FormData();
+            formData.append('name', name);
+            formData.append('pwd', password);
+
+            fetch("/sso/doLogin", {
+                body: formData,
+                cache: 'no-cache',
+                method: 'POST',
+                mode: 'cors',
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.code == 200) {
+                    showToast('认证成功，正在跳转...', 'success');
+                    setTimeout(() => {
+                        location.href = location.search.slice(location.search.indexOf("redirect") + 9);
+                    }, 1500);
+                } else {
+                    showToast('认证失败: ' + (data.message || "请检查用户名和密码"), 'error');
+                }
+            })
+            .catch(error => {
+                showToast('网络错误，请重试', 'error');
+                console.error('登录错误:', error);
+            })
+            .finally(() => {
+                loginBtn.innerHTML = originalText;
+                loginBtn.disabled = false;
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const inputs = document.querySelectorAll('.form-control');
+            inputs.forEach(input => {
+                input.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        login();
+                    }
+                });
+            });
+        });
+    </script>
 </body>
 </html>

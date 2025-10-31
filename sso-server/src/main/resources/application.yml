@@ -24,12 +24,27 @@ info:
   app: ${spring.application.name}
 
 sa-token:
+  is-log: true
   timeout: 86400
-  activity-timeout: 1200
-  sso:
-    # 使用Http请求校验ticket
-    is-http: true
+  active-timeout: 1200
+  sso-server:
     # Ticket有效期 (单位: 秒)，默认五分钟
     ticket-timeout: 300
-    # 所有允许的授权回调地址 （此处为了方便测试配置为*，线上生产环境一定要配置为详细地地址）
-    allow-url: "*"
+    # 签名密钥，建议设置为32位随机字符串
+    secret-key: uiZ%Z*UB#Yp7g#IMzn1#91kFNPpio7Uu
+    clients:
+      sso-client-system-1:
+        client: sso-client-system-1
+        # 允许授权地址
+        allow-url: "*"
+        # 是否接收消息推送
+        is-push: true
+        # 消息推送地址
+        push-url: http://sso-client-system1:17001/sso/pushC
+        secret-key: "kRt9&b7Bv0GsTvgU0e#YrIo$hC$hpz!!"
+      sso-client-system-2:
+        client: sso-client-system-2
+        allow-url: "*"
+        is-push: true
+        push-url: http://sso-client-system2:17002/sso/pushC
+        secret-key: "%py2Q!gJTC&f7TVv913#b$u6BgH^eJVB"

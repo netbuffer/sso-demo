@@ -1,9 +1,9 @@
 package cn.netbuffer.ssodemo.ssoclient_system.controller;
 
-import cn.dev33.satoken.config.SaTokenConfig;
-import cn.dev33.satoken.sso.SaSsoHandle;
+import cn.dev33.satoken.context.SaHolder;
+import cn.dev33.satoken.sso.processor.SaSsoClientProcessor;
+import cn.dev33.satoken.sso.template.SaSsoClientTemplate;
 import cn.dev33.satoken.stp.StpUtil;
-import com.ejlchina.okhttps.OkHttps;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,7 +20,7 @@ public class SsoClientController {
     @Value("${spring.application.name}")
     private String applicationName;
 
-    // 首页 
+    // 首页
     @RequestMapping("/")
     public String index() {
         log.debug("get index");
@@ -34,25 +34,26 @@ public class SsoClientController {
 
     /*
      * SSO-Client端：处理所有SSO相关请求
-     *         http://{host}:{port}/sso/login          -- Client端登录地址，接受参数：back=登录后的跳转地址
-     *         http://{host}:{port}/sso/logout         -- Client端单点注销地址（isSlo=true时打开），接受参数：back=注销后的跳转地址
-     *         http://{host}:{port}/sso/logoutCall     -- Client端单点注销回调地址（isSlo=true时打开），此接口为框架回调，开发者无需关心
+     *         http://{host}:{port}/sso/login            -- Client 端登录地址
+     *         http://{host}:{port}/sso/logout            -- Client 端注销地址（isSlo=true时打开）
+     *         http://{host}:{port}/sso/pushC            -- Client 端接收消息推送地址
      */
     @RequestMapping("/sso/*")
     public Object ssoRequest() {
-        return SaSsoHandle.clientRequest();
+        return SaSsoClientProcessor.instance.dister();
     }
 
-    // 配置SSO相关参数
+    // 配置SSO Client相关参数
     @Autowired
-    private void configSso(SaTokenConfig cfg) {
-        cfg.sso
-            // 配置 Http 请求处理器
-            .setSendHttp(url -> {
-                String result=OkHttps.sync(url).get().getBody().toString();
-                log.debug("client url={} result={}",url,result);
-                return result;
-            })
-        ;
+    private void configSso(SaSsoClientTemplate ssoClientTemplate) {
+
     }
+
+    // 当前应用独自注销 (不退出其它应用)
+    @RequestMapping("/sso/logoutByAlone")
+    public Object logoutByAlone() {
+        StpUtil.logout();
+        return SaSsoClientProcessor.instance._ssoLogoutBack(SaHolder.getRequest(), SaHolder.getResponse());
+    }
+
 }

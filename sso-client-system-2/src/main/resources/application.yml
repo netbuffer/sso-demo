@@ -24,13 +24,14 @@ info:
   app: ${spring.application.name}
 
 sa-token:
+  is-log: true
   timeout: 86400
-  activity-timeout: 1200
-  sso:
-    # SSO-Server端 统一认证地址
-    auth-url: http://sso-server.com:17000/sso/auth
+  active-timeout: 1200
+  sso-client:
+    client: ${spring.application.name}
+    # SSO-Server端主机地址
+    server-url: http://sso-server.com:17000
     # 是否打开单点注销接口
     is-slo: true
     is-http: true
-    # SSO-Server端 ticket校验地址
-    check-ticket-url: http://sso-server.com:17000/sso/checkTicket
+    secret-key: "%py2Q!gJTC&f7TVv913#b$u6BgH^eJVB"

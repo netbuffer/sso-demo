@@ -16,6 +16,10 @@
     <name>sso-client-system-1</name>
 
     <dependencies>
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-forest</artifactId>
+        </dependency>
     </dependencies>
 
     <build>
