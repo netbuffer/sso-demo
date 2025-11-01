@@ -2,7 +2,6 @@
 ![](https://img.shields.io/static/v1?label=jdk&message=1.8&color=blue)
 ![](https://img.shields.io/static/v1?label=sppring-boot&message=2.7.18&color=blue)
 ![sa-token 1.44.0](https://img.shields.io/static/v1?label=sa-token&message=1.44.0&color=47BA86)
-![](https://img.shields.io/static/v1?label=okhttps&message=3.1.1&color=blue)
 
 > 基于 [sa-token](https://sa-token.cc/) 实现单点登录系统
 * https://github.com/netbuffer/sso-demo
